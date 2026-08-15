@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f172a, #0e7490);
+        }
+
+        .card {
+            width: 450px;
+            padding: 40px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            text-align: center;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        a {
+            display: block;
+            margin-top: 20px;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <h1>Admin Portal</h1>
+
+        <p>Health and Hygiene Audit System</p>
+
+        <form onsubmit="return login()">
+
+            <input type="text" id="adminId" placeholder="Admin ID" required>
+
+            <input type="password" id="adminPassword"
+                placeholder="Password" required>
+
+            <button type="submit">Login</button>
+
+        </form>
+
+        <a href="index.html">Back to Home</a>
+
+    </div>
+
+    <script>
+
+        function login() {
+
+            let id =
+                document.getElementById("adminId").value;
+
+            let password =
+                document.getElementById("adminPassword").value;
+
+            if (id === "H&H" && password === "health") {
+
+                window.location.href = "dashboard.html";
+
+            }
+
+            else {
+
+                alert("Invalid ID or Password");
+
+            }
+
+            return false;
+
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Food Center Management Dashboard</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#0f172a,#1e3a8a,#0284c7);
+min-height:100vh;
+padding:40px;
+}
+
+.header{
+max-width:1200px;
+margin:auto;
+background:rgba(255,255,255,.12);
+backdrop-filter:blur(20px);
+padding:25px;
+border-radius:20px;
+text-align:center;
+color:white;
+margin-bottom:30px;
+}
+
+.dashboard{
+max-width:1200px;
+margin:auto;
+background:rgba(255,255,255,.12);
+backdrop-filter:blur(20px);
+padding:30px;
+border-radius:20px;
+}
+
+.form{
+display:grid;
+gap:15px;
+}
+
+input,
+textarea{
+padding:15px;
+border:none;
+border-radius:12px;
+font-size:16px;
+}
+
+textarea{
+height:100px;
+resize:none;
+}
+
+.add-btn{
+padding:15px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-size:16px;
+}
+
+.cards{
+margin-top:30px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+gap:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:20px;
+}
+
+.card img{
+width:100%;
+height:250px;
+object-fit:cover;
+border-radius:15px;
+margin-bottom:15px;
+}
+
+.card h2{
+margin-bottom:10px;
+}
+
+.card p{
+margin-bottom:8px;
+}
+
+.qr{
+text-align:center;
+margin-top:20px;
+}
+
+.download-btn{
+width:100%;
+padding:10px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+.buttons{
+display:flex;
+gap:10px;
+margin-top:15px;
+}
+
+.edit-btn,
+.delete-btn{
+flex:1;
+padding:12px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+<h1>🍔 Food Center Management Dashboard</h1>
+
+<p>Health and Hygiene Awareness & Hygiene Audit System</p>
+
+</div>
+
+<div class="dashboard">
+
+<div class="form">
+
+<input
+type="text"
+id="centerName"
+placeholder="Food Center Name">
+
+<input
+type="text"
+id="ownerName"
+placeholder="Owner Name">
+
+<input
+type="text"
+id="centerNumber"
+placeholder="Center Number">
+
+<textarea
+id="address"
+placeholder="Address"></textarea>
+
+<input
+type="file"
+id="photo"
+accept="image/*">
+
+<button
+class="add-btn"
+onclick="addOrUpdate()">
+
+Save Food Center
+
+</button>
+
+</div>
+
+<div
+class="cards"
+id="cards">
+
+</div>
+
+</div>
+
+<script>
+
+let centers=
+JSON.parse(
+localStorage.getItem(
+"foodCenters"
+)
+)||[];
+
+let editIndex=-1;
+
+function saveData(){
+
+localStorage.setItem(
+"foodCenters",
+JSON.stringify(centers)
+);
+
+}
+
+function displayCenters(){
+
+let cards=
+document.getElementById("cards");
+
+cards.innerHTML="";
+
+centers.forEach((center,index)=>{
+
+cards.innerHTML+=`
+
+<div class="card">
+
+<img src="${center.photo}">
+
+<h2>🍔 ${center.name}</h2>
+
+<p><b>👤 Owner:</b> ${center.owner}</p>
+
+<p><b>☎️ Number:</b> ${center.number}</p>
+
+<p><b>📍 Address:</b> ${center.address}</p>
+
+<div class="qr">
+
+<p><b>📱 Scan For Feedback</b></p>
+
+<div id="qr-${index}"></div>
+
+<button
+class="download-btn"
+onclick="downloadQR(${index})">
+
+⬇️ Download QR
+
+</button>
+
+</div>
+
+<div class="buttons">
+
+<button
+class="edit-btn"
+onclick="editCenter(${index})">
+
+✏️ Edit
+
+</button>
+
+<button
+class="delete-btn"
+onclick="deleteCenter(${index})">
+
+🗑️ Delete
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+centers.forEach((center,index)=>{
+
+new QRCode(
+
+document.getElementById(`qr-${index}`),
+
+{
+
+text:"feedback.html",
+
+width:120,
+
+height:120
+
+}
+
+);
+
+});
+
+}
+
+function addOrUpdate(){
+
+let file=
+document.getElementById("photo").files[0];
+
+let name=
+document.getElementById("centerName").value;
+
+let owner=
+document.getElementById("ownerName").value;
+
+let number=
+document.getElementById("centerNumber").value;
+
+let address=
+document.getElementById("address").value;
+
+if(name===""){
+
+return;
+
+}
+
+if(file){
+
+let reader=
+new FileReader();
+
+reader.onload=function(e){
+
+let center={
+
+name:name,
+owner:owner,
+number:number,
+address:address,
+photo:e.target.result
+
+};
+
+if(editIndex===-1){
+
+centers.push(center);
+
+}else{
+
+centers[editIndex]=center;
+
+editIndex=-1;
+
+}
+
+saveData();
+
+displayCenters();
+
+clearForm();
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+}
+
+function editCenter(index){
+
+let center=
+centers[index];
+
+document.getElementById(
+"centerName"
+).value=center.name;
+
+document.getElementById(
+"ownerName"
+).value=center.owner;
+
+document.getElementById(
+"centerNumber"
+).value=center.number;
+
+document.getElementById(
+"address"
+).value=center.address;
+
+editIndex=index;
+
+}
+
+function deleteCenter(index){
+
+centers.splice(index,1);
+
+saveData();
+
+displayCenters();
+
+}
+
+function downloadQR(index){
+
+let canvas=
+document.querySelector(
+`#qr-${index} canvas`
+);
+
+if(!canvas){
+
+return;
+
+}
+
+let link=
+document.createElement("a");
+
+link.download=
+`${centers[index].name}-QR.png`;
+
+link.href=
+canvas.toDataURL();
+
+link.click();
+
+}
+
+function clearForm(){
+
+document.getElementById(
+"centerName"
+).value="";
+
+document.getElementById(
+"ownerName"
+).value="";
+
+document.getElementById(
+"centerNumber"
+).value="";
+
+document.getElementById(
+"address"
+).value="";
+
+document.getElementById(
+"photo"
+).value="";
+
+}
+
+displayCenters();
+
+</script>
+
+</body>
+
+</html>
